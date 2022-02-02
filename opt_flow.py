@@ -16,7 +16,7 @@ mask = np.zeros_like(first_frame)
 
 # Sets image saturation to maximum
 mask[..., 1] = 255
-
+i = 0
 while(cap.isOpened()):
     # Read each frame in the video
     ret, frame = cap.read()
@@ -26,8 +26,8 @@ while(cap.isOpened()):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Calculates optical flow using Farneback method
-    flow = cv2.calcOpticalFlowFarneback(prev_gray, gray, 
-                                        None, 
+    flow = cv2.calcOpticalFlowFarneback(prev_gray, gray,
+                                        None,
                                         0.5, 3, 15, 3, 5, 1.2, 0)
 
     # Magnitude and angle of 2D vectors
@@ -42,6 +42,8 @@ while(cap.isOpened()):
     # Converts HSV to RGB again for display
     rgb = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
     cv2.imshow("Dense optical flow", rgb)
+    cv2.imwrite(f"optflow{i}.png", rgb)
+    i += 1
 
     # Update the prev_gray variable
     prev_gray = gray
