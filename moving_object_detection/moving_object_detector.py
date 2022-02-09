@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from re import X
 from typing import List, Tuple
 import cv2
-from matplotlib.pyplot import connect
 import numpy as np
 from optical_flow import OpticalFlow
+import uuid
 
 
 @dataclass
@@ -16,7 +16,10 @@ class MovingObject:
     center_x: int
     center_y: int
     mask: np.array
+    unique_id: uuid.UUID = uuid.uuid4()
 
+    def __hash__(self):
+        return str(self.unique_id)
 
 class MovingObjectDetector:
     def __init__(self, area_threshold: int = 3000) -> None:
