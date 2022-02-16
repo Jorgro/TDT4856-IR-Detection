@@ -1,10 +1,9 @@
 import tkinter as tk
-from PIL import Image,ImageTk
-#from tkVideoPlayer import TkinterVideo
+from PIL import Image, ImageTk
 
 # Defines
 N = 3                                       # Number of images
-canvas_width, canvas_height = 1400, 400     # Dimensions of window
+canvas_width, canvas_height = 1400, 600     # Dimensions of window
 
 # Function for resizing images
 def resize_img(img: 'Image') -> 'ImageTk.PhotoImage':
@@ -47,17 +46,5 @@ def display_images(file1: 'str', file2: 'str', file3: 'str'):
     canvas.create_text(220 + canvas_part, y0 - 20, text="Optical flow", fill="black", font=('Helvetica 15 bold'))
     canvas.create_text(220 + 2*canvas_part, y0 - 20, text="Detected elements", fill="black", font=('Helvetica 15 bold'))
 
-    # start the program      
+    # Start the program      
     tk.mainloop()  
-
-display_images('test.png', 'testing.png', 'testing.png')
-
-#Scaling video
-#videoplayer = TkinterVideo(master=root, scaled=True, pre_load=False)
-
-#load video from foldeer
-#videoplayer.load(r"samplevideo.mp4")
-#videoplayer.pack(expand=True, fill="both")
-
-# play the video
-#videoplayer.play() 
