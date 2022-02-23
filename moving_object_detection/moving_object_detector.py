@@ -9,6 +9,8 @@ from utils import threshold_image
 
 
 class MovingObject:
+    UID = 1
+
     def __init__(self, x: int, y: int, w: int, h: int, area: float, center: np.array):
         self.x = x
         self.y = y
@@ -18,7 +20,8 @@ class MovingObject:
         self.center = center
         self.positions: List[np.array] = [self.center]
         self.updated = True
-        self.unique_id: uuid.UUID = uuid.uuid4()
+        self.unique_id = MovingObject.UID
+        MovingObject.UID += 1
 
     def update(self, x, y, w, h, area, center):
         self.x = x
@@ -93,7 +96,7 @@ class MovingObjectDetector:
             )
             cv2.putText(
                 output,
-                f"Moving Object {i}",
+                f"Moving Object {obj.unique_id}",
                 (obj.x, obj.y - 10),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,
