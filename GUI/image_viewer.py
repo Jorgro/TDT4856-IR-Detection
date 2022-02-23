@@ -1,5 +1,6 @@
 import os
 import glob
+import time
 from tkinter import filedialog
 import tkinter as tk
 from PIL import ImageTk, Image
@@ -18,6 +19,8 @@ class ImageViewer(object):
 
         self.main_dir = None
         self.iter = 0
+        self.num_files = None
+        self.skip_length = 2
 
         input_img, optflow_img, bbox_img, wh, ht = self.open_file()
         self.canvas = tk.Canvas(self.root, width=wh, height=ht)
@@ -27,17 +30,48 @@ class ImageViewer(object):
         self.image2_on_canvas = self.canvas.create_image(self.x0 + self.canvas_part, self.y0, anchor='nw', image=optflow_img)
         self.image3_on_canvas = self.canvas.create_image(self.x0 + 2*self.canvas_part, self.y0, anchor='nw', image=bbox_img)
 
-        self.canvas.create_text(240, self.y0 - 20, text="Input image", fill="black", font=('Helvetica 17 bold'))
-        self.canvas.create_text(240 + self.canvas_part, self.y0 - 20, text="Optical flow", fill="black", font=('Helvetica 17 bold'))
-        self.canvas.create_text(240 + 2*self.canvas_part, self.y0 - 20, text="Detected elements", fill="black", font=('Helvetica 17 bold'))
+        self.canvas.create_text(240, self.y0 - 20, 
+                                text="Input image", 
+                                fill="black", font=('Helvetica 17 bold'))
 
-        self.canvas.create_text(self.width//2, self.height//2 + 80, text="Press the button above or enter for the next image", fill="black", font=('Helvetica 16 bold'), anchor='center')
-        self.canvas.create_text(self.width//2, self.height//2 + 110, text="Press Q to quit", fill="black", font=('Helvetica 15 bold'), anchor='center')
+        self.canvas.create_text(240 + self.canvas_part, self.y0 - 20, 
+                                text="Optical flow", 
+                                fill="black", font=('Helvetica 17 bold'))
+
+        self.canvas.create_text(240 + 2*self.canvas_part, self.y0 - 20, 
+                                text="Detected elements", fill="black", font=('Helvetica 17 bold'))
+
+        self.canvas.create_text(self.width//2, self.height//2 + 80, 
+                                text="Press the buttons above or arrows for the next and previous image", 
+                                fill="black", font=('Helvetica 16 bold'), anchor='center')
+
+        self.skip_text = self.canvas.create_text(self.width//2, self.height//2 + 110, 
+                                text="Press space to skip "+str(self.skip_length)+" images", 
+                                fill="black", font=('Helvetica 16 bold'), anchor='center')     
+                     
+
+        self.canvas.create_text(self.width//2, self.height//2 + 140, 
+                                text="Press Q to quit", 
+                                fill="black", font=('Helvetica 16 bold'), anchor='center')
         
-        b = tk.Button(self.root, text='Next image', command=self.next_image)
-        b.place(relx=0.5, rely=0.6, anchor='center')
+        self.next = tk.Button(self.root, text='Next image', command=self.next_image)
+        self.next.place(relx=0.5, rely=0.6, anchor='center')
 
-        self.root.bind('<Return>', self.next_image)
+        self.prev = tk.Button(self.root, text='Previous image', command=self.prev_image)
+        self.prev.place(relx=0.4, rely=0.6, anchor='center')
+
+        self.skip = tk.Button(self.root, text='Skip', command=self.skip_image)
+        self.skip.place(relx=0.58, rely=0.6, anchor='center')
+
+        self.skip_input = tk.Text(self.root, height=1, width=5, borderwidth=1, relief="solid")
+        self.skip_input.place(relx=0.83, rely=0.6, anchor='center')
+
+        self.skip_input_btn = tk.Button(self.root, text='Change skip-length', command=self.change_skip_length)
+        self.skip_input_btn.place(relx=0.83, rely=0.65, anchor='center')
+
+        self.root.bind('<Right>', self.next_image)
+        self.root.bind('<Left>', self.prev_image)
+        self.root.bind('<space>', self.skip_image)
         self.root.bind('q', self.quit)
 
         self.root.mainloop()
@@ -48,6 +82,11 @@ class ImageViewer(object):
         input_file = self.main_dir + "/input_images/input"+str(self.iter)+".png"
         optflow_file = self.main_dir + "/optflow_images/optflow"+str(self.iter)+".png"
         bbox_file = self.main_dir + "/bbox_images/bbox"+str(self.iter)+".png"
+
+        input_files = os.listdir(self.main_dir + "/input_images")
+        if '.DS_Store' in input_files:
+            input_files.pop(input_files.index('.DS_Store'))
+        self.num_files = len(input_files)
 
         self.input_images = glob.glob(os.path.dirname(input_file) + '/*.png')
         self.optflow_images = glob.glob(os.path.dirname(optflow_file) + '/*.png')
@@ -67,7 +106,8 @@ class ImageViewer(object):
 
     def next_image(self, event: 'tk.Event' = None):
 
-        self.iter += 1
+        if self.iter < self.num_files - 1:
+            self.iter += 1
 
         input_image = self.main_dir + "/input_images/input"+str(self.iter)+".png"
         optflow_image = self.main_dir + "/optflow_images/optflow"+str(self.iter)+".png"
@@ -90,6 +130,22 @@ class ImageViewer(object):
             self.canvas.wait_visibility()
         except tk.TclError:
             pass
+    
+    def prev_image(self, event: 'tk.Event' = None):
+        if self.iter >= 1:
+            self.iter -= 2
+            self.next_image()
+    
+    def skip_image(self, event: 'tk.Event' = None):
+        if self.num_files > self.iter + self.skip_length:
+            self.iter += self.skip_length - 1
+            self.next_image()
+
+    def change_skip_length(self):
+        if self.skip_input.get("1.0", "end") is not '\n':
+            self.skip_length = int(self.skip_input.get("1.0", "end"))
+            self.canvas.itemconfig(self.skip_text, 
+                                   text="Press space to skip "+str(self.skip_length)+" images")
 
     def resize_img(self, img: 'Image') -> 'ImageTk.PhotoImage':
         width, height = img.size

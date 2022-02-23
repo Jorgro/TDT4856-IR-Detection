@@ -35,4 +35,3 @@ class VideoUploader(object):
         self.root.destroy()
 
 path = VideoUploader().get_dir()
-print(path)
