@@ -82,11 +82,10 @@ class MovingObjectDetector:
                 self.moving_objects.remove(obj)
 
     @staticmethod
-    def threshold_image(image: np.array, threshold: int) -> np.array:
-        non_black_pixels = np.where((image[:, :] > threshold))
-        img = np.zeros((image.shape[0], image.shape[1])).astype(np.uint8)
-        img[non_black_pixels] = 255
-        return img
+    def threshold_image(image: np.array) -> np.array:
+        blur = cv2.GaussianBlur(image, (5, 5), 0)
+        _, ret = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        return ret
 
     def get_image_with_bounding_boxes(self, image: np.array):
         output = image.copy()
@@ -140,8 +139,7 @@ class MovingObjectDetector:
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture("./data/videos/cars.mp4")
-    print(cap.get(cv2.CAP_PROP_FPS)
-)
+    # print(cap.get(cv2.CAP_PROP_FPS))
     _, first_frame = cap.read()
     _, second_frame = cap.read()
     _, third_frame = cap.read()
@@ -156,4 +154,10 @@ if __name__ == "__main__":
     print(mod.moving_objects)
     bb_img = mod.get_image_with_bounding_boxes(third_frame)
     cv2.imwrite("./data/images/bb_image_test.png", bb_img)
+
+    # opt = OpticalFlow()
+    # opt.run(first_frame)
+    # img = opt.run(second_frame)
+    # ret = MovingObjectDetector.threshold_image(img[..., 2])
+    # cv2.imwrite("./data/images/test_threshold_otsu.png", ret)
 
