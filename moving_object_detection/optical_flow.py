@@ -28,7 +28,7 @@ class OpticalFlow:
 
         # Calculate flow
         flow = cv2.calcOpticalFlowFarneback(
-            self.prev_image, new_image, None, 0.5, 3, 15, 3, 5, 1.2, 0
+            self.prev_image, new_image, None, 0.5, 3, 10, 3, 5, 1.2, 0
         )
 
         # Magnitude and angle of 2D vectors

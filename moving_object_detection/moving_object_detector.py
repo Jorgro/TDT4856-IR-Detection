@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from optical_flow import OpticalFlow
 import uuid
+from utils import threshold_image
 
 
 class MovingObject:
@@ -44,11 +45,11 @@ class MovingObjectDetector:
         self.thresholded_image = None
 
     def run(self, input_image: np.array) -> None:
-        opt_flow_image = self.opt_flow.run(input_image)
-        if opt_flow_image is None:
+        self.opt_flow_image = self.opt_flow.run(input_image)
+        if self.opt_flow_image is None:
             return
-        self.thresholded_image = MovingObjectDetector.threshold_image(
-            opt_flow_image[..., 2], 10
+        self.thresholded_image = threshold_image(
+            self.opt_flow_image[..., 2]
         )  # The third channel of HSV is Value (intensity) which we will use as a grayscale.
         self.connected_components_labeling()
 
@@ -80,12 +81,6 @@ class MovingObjectDetector:
         for obj in self.moving_objects:
             if not obj.updated:
                 self.moving_objects.remove(obj)
-
-    @staticmethod
-    def threshold_image(image: np.array) -> np.array:
-        blur = cv2.GaussianBlur(image, (5, 5), 0)
-        _, ret = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        return ret
 
     def get_image_with_bounding_boxes(self, image: np.array):
         output = image.copy()
