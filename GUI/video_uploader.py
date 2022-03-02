@@ -14,8 +14,8 @@ class VideoUploader(object):
         self.canvas = tk.Canvas(self.root, width=self.width, height=self.height)
         self.canvas.pack()   
 
-        self.canvas.create_text(self.width//2, self.height//2 + 30, text="Press the button to upload file", fill="black", font=('Helvetica 16 bold'), anchor='center')
-        self.canvas.create_text(self.width//2, self.height//2 + 60, text="Press Q to quit", fill="black", font=('Helvetica 15 bold'), anchor='center')
+        self.canvas.create_text(self.width//2, self.height//2 + 40, text="Press the button to upload file", fill="black", font=('Helvetica 16 bold'), anchor='center')
+        self.canvas.create_text(self.width//2, self.height//2 + 70, text="Press Q to quit", fill="black", font=('Helvetica 15 bold'), anchor='center')
         
         b = tk.Button(self.root, text='Select file', command=self.open_file)
         b.place(relx=0.5, rely=0.3, anchor='center')
@@ -26,12 +26,11 @@ class VideoUploader(object):
   
     def open_file(self):
         self.dir = filedialog.askopenfile()
-        self.canvas.create_text(self.width//2, self.height//2, text="Upload complete!", fill="green", font=('Helvetica 15 bold'), anchor='center')
+        self.canvas.create_text(self.width//2, self.height//2, text="Upload complete!", fill="green", font=('Helvetica 16 bold'), anchor='center')
+
 
     def get_dir(self):
         return self.dir.name if self.dir else ""
     
     def quit(self, event: 'tk.Event' = None):
         self.root.destroy()
-
-path = VideoUploader().get_dir()
