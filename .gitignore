@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+./object_classifier/weights/best.pt
 __pycache__/
 *.py[cod]
 *$py.class

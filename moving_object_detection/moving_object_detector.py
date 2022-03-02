@@ -3,9 +3,10 @@ from re import X
 from typing import Dict, List, Tuple
 import cv2
 import numpy as np
-from optical_flow import OpticalFlow
+from moving_object_detection.optical_flow import OpticalFlow
 import uuid
-from utils import threshold_image
+from moving_object_detection.utils import threshold_image
+from utils import Point
 
 
 class MovingObject:
@@ -22,6 +23,9 @@ class MovingObject:
         self.updated = True
         self.unique_id = MovingObject.UID
         MovingObject.UID += 1
+
+    def get_bbx(self) -> List[Point]:
+        return [Point(self.x, self.y), Point(self.x + self.w, self.y + self.h)]
 
     def update(self, x, y, w, h, area, center):
         self.x = x

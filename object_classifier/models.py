@@ -1,8 +1,8 @@
 import torch.nn.functional as F
 
-from utils.google_utils import *
-from utils.parse_config import *
-from utils.utils import *
+from object_classifier.utils.google_utils import *
+from object_classifier.utils.parse_config import *
+from object_classifier.utils.utils import *
 
 ONNX_EXPORT = False
 
