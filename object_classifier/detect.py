@@ -1,12 +1,13 @@
+from http.client import ImproperConnectionState
 from models import *  # set ONNX_EXPORT in models.py
 from utils.datasets import *
 from utils.utils import *
 
 
 def detect(image,
-           cfg='cfg/yolov3-spp-r.cfg',
-           data='data/custom.data',
-           weights='weights/best.pt',
+           cfg='object_classifier/cfg/yolov3-spp-r.cfg',
+           names_data='object_classifier/data/custom.names',
+           weights='object_classifier/weights/best.pt',
            img_size=416,
            conf_thres=0.3,
            nms_thres=0.5,
@@ -49,7 +50,8 @@ def detect(image,
     img /= 255.0  # 0 - 255 to 0.0 - 1.0
 
     # Get classes and colors
-    classes = load_classes(parse_data_cfg(data)['names'])
+    #classes = load_classes(parse_data_cfg(data)['names'])
+    classes = load_classes(names_data)
 
     # Run inference and get detections
     img = torch.from_numpy(img).to(device)
@@ -81,9 +83,16 @@ def detect(image,
     return image, detections
 
 
-def run():
+def run(image):
     """
     Runs detection with only forward-pass
     """
     with torch.no_grad():
-        return detect(data)
+        return detect(image)
+
+
+if __name__ == "__main__":
+    img = cv2.imread("object_classifier/data/dashboard_cam.jpeg")
+    image, detections = run(img)
+    print(image)
+    print(detections)
