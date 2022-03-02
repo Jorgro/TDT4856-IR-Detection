@@ -49,7 +49,6 @@ def detect(image,
     img /= 255.0  # 0 - 255 to 0.0 - 1.0
 
     # Get classes and colors
-    #classes = load_classes(parse_data_cfg(data)['names'])
     classes = load_classes(names_data)
 
     # Run inference and get detections
