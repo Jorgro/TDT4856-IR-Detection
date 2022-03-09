@@ -42,5 +42,3 @@ if __name__ == "__main__":
     obj_merger = ObjectMerger()
     obj_merger.merge_objects(m1, c1)
 
-
-

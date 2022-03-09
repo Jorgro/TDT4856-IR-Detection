@@ -3,7 +3,6 @@ import cv2
 from moving_object_detection.moving_object_detector import MovingObjectDetector
 from object_merger import ObjectMerger
 from object_classifier.classified_object import get_image_with_bbx
-from GUI.image_viewer import ImageViewer
 
 cap = cv2.VideoCapture("./data/videos/cars.mp4")
 
@@ -44,5 +43,4 @@ while i < 30:
     i += 1
 
 
-# img = ImageViewer()
 

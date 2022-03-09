@@ -33,7 +33,7 @@ class ImageViewer(object):
         self.height = self.root.winfo_screenheight()
         self.canvas_part = self.width // self.N  # Horizontal part taken up by image
 
-        self.main_dir = "../data/GUI_images"
+        self.main_dir = "./data/GUI_images"
         self.iter = 0
         self.num_files = None
         self.skip_length = 2
