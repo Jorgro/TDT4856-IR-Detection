@@ -6,48 +6,13 @@ import numpy as np
 from moving_object_detection.optical_flow import OpticalFlow
 import uuid
 from moving_object_detection.utils import threshold_image
-from utils import Point
-
-
-class MovingObject:
-    UID = 1
-
-    def __init__(self, x: int, y: int, w: int, h: int, area: float, center: np.array):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        self.area = area
-        self.center = center
-        self.positions: List[np.array] = [self.center]
-        self.updated = True
-        self.unique_id = MovingObject.UID
-        MovingObject.UID += 1
-
-    def get_bbx(self) -> List[Point]:
-        return [Point(self.x, self.y), Point(self.x + self.w, self.y + self.h)]
-
-    def update(self, x, y, w, h, area, center):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        self.area = area
-        self.center = center
-        self.updated = True
-        self.positions.append(self.center)
-
-    def __hash__(self):
-        return str(self.unique_id)
-
-    def __repr__(self):
-        return f"MovingObject({self.center[0]},{self.center[1]})"
+from object import Object
 
 
 class MovingObjectDetector:
     def __init__(self, area_threshold: int = 3000) -> None:
         self.area_threshold = area_threshold
-        self.moving_objects: List[MovingObject] = []
+        self.moving_objects: List[Object] = []
         self.opt_flow = OpticalFlow()
         self.thresholded_image = None
 
@@ -137,7 +102,7 @@ class MovingObjectDetector:
             if Z_Sum[min_index] < 0.5:
                 self.moving_objects[min_index].update(x, y, w, h, area, center)
                 return
-        self.moving_objects.append(MovingObject(x, y, w, h, area, center))
+        self.moving_objects.append(Object(x, y, w, h, area, center))
 
 
 if __name__ == "__main__":

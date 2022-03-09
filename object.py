@@ -1,33 +1,47 @@
-import random
-import numpy as np
-from typing import Dict, List, Tuple
-from object import Object
-from utils import Point
+from typing import List
 import cv2
+import numpy as np
+from utils import Point
 
 
-class ClassifiedObject(Object):
+class Object:
     UID = 1
 
     def __init__(
-        self,
-        x: int,
-        y: int,
-        w: int,
-        h: int,
-        area: float,
-        center: np.array,
-        conf: float,
-        classification: str,
+        self, x: int, y: int, w: int, h: int, area: float, center: np.array,
     ):
-        super().__init__(x, y, w, h, area, center)
-        self.classification = classification
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.area = area
+        self.center = center
+        self.positions: List[np.array] = [self.center]
+        self.updated = True
+        self.unique_id = Object.UID
+        Object.UID += 1
+
+    def get_bbx(self) -> List[Point]:
+        return [Point(self.x, self.y), Point(self.x + self.w, self.y + self.h)]
+
+    def update(self, x, y, w, h, area, center):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.area = area
+        self.center = center
+        self.updated = True
+        self.positions.append(self.center)
+
+    def __hash__(self):
+        return str(self.unique_id)
 
     def __repr__(self):
-        return f"ClassifiedObject({self.center[0]},{self.center[1]})"
+        return f"Object({self.center[0]},{self.center[1]})"
 
 
-def get_image_with_bbx(class_objs: List[ClassifiedObject], image):
+def get_image_with_bbx(class_objs: List[Object], image):
     output = np.copy(image)
     for obj in class_objs:
         bbx = obj.get_bbx()
@@ -37,6 +51,7 @@ def get_image_with_bbx(class_objs: List[ClassifiedObject], image):
         )  # line thickness
         c1, c2 = (bbx[0].x, bbx[0].y), (bbx[1].x, bbx[1].y)
         cv2.rectangle(output, c1, c2, (0, 255, 0), thickness=tl)
+
         if obj.classification:
             tf = max(tl - 1, 1)  # font thickness
             t_size = cv2.getTextSize(
