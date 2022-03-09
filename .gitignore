@@ -131,3 +131,4 @@ dmypy.json
 
 # MacOS specific
 .DS_Store
+/object_classifier/weights/*
