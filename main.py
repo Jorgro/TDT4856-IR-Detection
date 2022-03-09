@@ -4,7 +4,7 @@ from moving_object_detection.moving_object_detector import MovingObjectDetector
 from object_merger import ObjectMerger
 from object_classifier.classified_object import get_image_with_bbx
 
-cap = cv2.VideoCapture("./data/videos/cars.mp4")
+cap = cv2.VideoCapture("./data/videos/street.mp4")
 
 # print(cap.get(cv2.CAP_PROP_FPS))
 
@@ -12,19 +12,20 @@ mod = MovingObjectDetector()
 obc = ObjectClassifier()
 obj_merger = ObjectMerger()
 
+
 ret, frame = cap.read()
+
 
 mod.run(frame)
 obc.run(frame)
 
 i = 0
-while i < 10:
+while ret and i < 100:
     ret, frame = cap.read()
     mov_objs = mod.run(frame)
     thresholded_img = mod.thresholded_image.copy()
     class_objs = obc.run(frame)
-    mov_class_objs = obj_merger.merge_objects_with_threshold(
-        thresholded_img, class_objs)
+    mov_class_objs = obj_merger.run(mov_objs, class_objs, thresholded_img)
 
     # Plot bounding boxes of objects in original image
 
@@ -33,7 +34,7 @@ while i < 10:
     mov_class_objs_img = get_image_with_bbx(mov_class_objs, frame)
 
     main_dir = "./data/GUI_images"
-    print("Writing images")
+    print(f"Writing image {i}")
     cv2.imwrite(f"{main_dir}/input/image{i}.png", frame)
     cv2.imwrite(f"{main_dir}/moving_bbxs/image{i}.png", mov_objs_img)
     cv2.imwrite(f"{main_dir}/classified_bbxs/image{i}.png", class_objs_img)

@@ -80,6 +80,8 @@ class ObjectClassifier:
                 det[:, :4] = scale_coords(
                     img.shape[2:], det[:, :4], image.shape
                 ).round()
+            else:
+                continue
 
             for *xyxy, conf, _, cls in det:  # info about detection
                 top_left_coor = xyxy[:2]

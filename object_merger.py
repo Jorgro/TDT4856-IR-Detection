@@ -41,7 +41,7 @@ class ObjectMerger:
     def merge_objects_with_threshold(
         self, threshold_img: np.array, classified_objects: List[ClassifiedObject],
     ):
-        self.moving_classified_objects: List[ClassifiedObject] = []
+        self.moving_classified_objects: List[Object] = []
 
         for class_obj in classified_objects:
 
@@ -50,14 +50,12 @@ class ObjectMerger:
             Y1 = class_obj.get_bbx()[0].y
             Y2 = class_obj.get_bbx()[1].y
 
-            A_total_class_obj = (X2 - X1) * (Y2 - Y1)
-
             bbx = threshold_img[Y1:Y2, :]
             bbx = bbx[:, X1:X2]
 
             non_zero = np.count_nonzero(bbx)
 
-            fraction = non_zero / A_total_class_obj
+            fraction = non_zero / class_obj.area
 
             if fraction > 0.25:
                 self.moving_classified_objects.append(class_obj)
@@ -95,19 +93,19 @@ class ObjectMerger:
         self.moving_classified_objects.append(Object(x, y, w, h, area, center))
 
     def run(
-        self, moving_objects: List[Object], classified_objects: List[ClassifiedObject]
+        self, moving_objects: List[Object], classified_objects: List[ClassifiedObject], thresholded_img: np.array
     ):
-        self.merge_objects(moving_objects, classified_objects)
+        self.merge_objects_with_threshold(thresholded_img, classified_objects)
 
         for mov in moving_objects:
             any_overlap = False
             for cls in classified_objects:
-                if ObjectMerger.get_overlap(mov, cls) > 0:
+                if ObjectMerger.get_overlap(mov, cls)/mov.area > 0.1:
                     any_overlap = True
 
             if not any_overlap:
                 self.moving_classified_objects.append(mov)
-
+        return self.moving_classified_objects
 
 if __name__ == "__main__":
     m1 = [Object(5, 10, 5, 5, 200, (6, 7))]

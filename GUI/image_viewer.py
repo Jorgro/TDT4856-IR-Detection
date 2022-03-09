@@ -24,14 +24,14 @@ class ImageViewer(object):
             "/object_merger/",
         ]
 
-        self.N = len(self.image_paths)  # Number of images
-        self.x0, self.y0 = 10, 150  # Coordinates of upper left corner
+        self.N = len(self.image_paths) // 2  # Number of images
+        self.x0, self.y0 = 10, 80  # Coordinates of upper left corner
 
         self.root = tk.Tk()
         self.root.state("zoomed")
         self.width = self.root.winfo_screenwidth()
         self.height = self.root.winfo_screenheight()
-        self.canvas_part = self.width // self.N  # Horizontal part taken up by image
+        self.canvas_part = self.width // 3  # Horizontal part taken up by image
 
         self.main_dir = "./data/GUI_images"
         self.iter = 0
@@ -45,10 +45,14 @@ class ImageViewer(object):
         self.canvas_images = []
 
         for i, img in enumerate(images):
+            if i > 2:
+                y0 = self.y0 + 300
+                x0 = self.x0 + (i - 3) * self.canvas_part
+            else:
+                y0 = self.y0
+                x0 = self.x0 + i * self.canvas_part
             self.canvas_images.append(
-                self.canvas.create_image(
-                    self.x0 + i * self.canvas_part, self.y0, anchor="nw", image=img
-                )
+                self.canvas.create_image(x0, y0, anchor="nw", image=img)
             )
 
         self.canvas.create_text(
@@ -77,58 +81,58 @@ class ImageViewer(object):
 
         self.image_text = self.canvas.create_text(
             self.width // 2 + 5,
-            50,
+            20,
             text="Frame " + str(self.iter + 1),
             fill="black",
             font=("Helvetica 18 bold"),
             anchor="center",
         )
 
-        self.canvas.create_text(
-            self.width // 2,
-            self.height // 2 + 80,
-            text="Press the buttons above or arrows for the next and previous frame",
-            fill="black",
-            font=("Helvetica 16 bold"),
-            anchor="center",
-        )
+        # self.canvas.create_text(
+        #     self.width // 2,
+        #     self.height // 2 + 80,
+        #     text="Press the buttons above or arrows for the next and previous frame",
+        #     fill="black",
+        #     font=("Helvetica 16 bold"),
+        #     anchor="center",
+        # )
 
-        self.skip_text = self.canvas.create_text(
-            self.width // 2,
-            self.height // 2 + 110,
-            text="Press space to skip " + str(self.skip_length) + " frames",
-            fill="black",
-            font=("Helvetica 16 bold"),
-            anchor="center",
-        )
+        # self.skip_text = self.canvas.create_text(
+        #     self.width // 2,
+        #     self.height // 2 + 110,
+        #     text="Press space to skip " + str(self.skip_length) + " frames",
+        #     fill="black",
+        #     font=("Helvetica 16 bold"),
+        #     anchor="center",
+        # )
 
-        self.canvas.create_text(
-            self.width // 2,
-            self.height // 2 + 140,
-            text="Press Q to quit",
-            fill="black",
-            font=("Helvetica 16 bold"),
-            anchor="center",
-        )
+        # self.canvas.create_text(
+        #     self.width // 2,
+        #     self.height // 2 + 140,
+        #     text="Press Q to quit",
+        #     fill="black",
+        #     font=("Helvetica 16 bold"),
+        #     anchor="center",
+        # )
 
-        self.next = tk.Button(self.root, text="Next frame", command=self.next_image)
-        self.next.place(relx=0.51, rely=0.6, anchor="center")
+        # self.next = tk.Button(self.root, text="Next frame", command=self.next_image)
+        # self.next.place(relx=0.51, rely=0.6, anchor="center")
 
-        self.prev = tk.Button(self.root, text="Previous frame", command=self.prev_image)
-        self.prev.place(relx=0.41, rely=0.6, anchor="center")
+        # self.prev = tk.Button(self.root, text="Previous frame", command=self.prev_image)
+        # self.prev.place(relx=0.41, rely=0.6, anchor="center")
 
-        self.skip = tk.Button(self.root, text="Skip", command=self.skip_image)
-        self.skip.place(relx=0.59, rely=0.6, anchor="center")
+        # self.skip = tk.Button(self.root, text="Skip", command=self.skip_image)
+        # self.skip.place(relx=0.59, rely=0.6, anchor="center")
 
-        self.skip_input = tk.Text(
-            self.root, height=1, width=5, borderwidth=1, relief="solid"
-        )
-        self.skip_input.place(relx=0.83, rely=0.6, anchor="center")
+        # self.skip_input = tk.Text(
+        #     self.root, height=1, width=5, borderwidth=1, relief="solid"
+        # )
+        # self.skip_input.place(relx=0.83, rely=0.6, anchor="center")
 
-        self.skip_input_btn = tk.Button(
-            self.root, text="Change skip-length", command=self.change_skip_length
-        )
-        self.skip_input_btn.place(relx=0.83, rely=0.65, anchor="center")
+        # self.skip_input_btn = tk.Button(
+        #     self.root, text="Change skip-length", command=self.change_skip_length
+        # )
+        # self.skip_input_btn.place(relx=0.83, rely=0.65, anchor="center")
 
         self.root.bind("<Right>", self.next_image)
         self.root.bind("<Left>", self.prev_image)
@@ -206,10 +210,13 @@ class ImageViewer(object):
 
     def resize_img(self, img: "Image") -> "ImageTk.PhotoImage":
         width, height = img.size
-        width //= 4.2
-        height //= 4.2
+        width = self.canvas_part
+        height = height // (width / self.canvas_part)
         resized_image = img.resize((int(width), int(height)), Image.ANTIALIAS)
         return ImageTk.PhotoImage(resized_image)
 
     def quit(self, event: "tk.Event" = None):
         self.root.destroy()
+
+if __name__=="__main__":
+    img = ImageViewer()
