@@ -12,25 +12,25 @@ mod = MovingObjectDetector()
 obc = ObjectClassifier()
 obj_merger = ObjectMerger()
 
-
 ret, frame = cap.read()
 
 mod.run(frame)
 obc.run(frame)
 
 i = 0
-while i < 30:
+while i < 10:
     ret, frame = cap.read()
     mov_objs = mod.run(frame)
+    thresholded_img = mod.thresholded_image.copy()
     class_objs = obc.run(frame)
-    mov_class_objs = obj_merger.merge_objects(mov_objs, class_objs)
+    mov_class_objs = obj_merger.merge_objects_with_threshold(
+        thresholded_img, class_objs)
 
     # Plot bounding boxes of objects in original image
 
     mov_objs_img = mod.get_image_with_bounding_boxes(frame)
     class_objs_img = get_image_with_bbx(class_objs, frame)
     mov_class_objs_img = get_image_with_bbx(mov_class_objs, frame)
-    thresholded_img = mod.thresholded_image.copy()
 
     main_dir = "./data/GUI_images"
     print("Writing images")
@@ -41,6 +41,3 @@ while i < 30:
     cv2.imwrite(f"{main_dir}/object_merger/image{i}.png", mov_class_objs_img)
 
     i += 1
-
-
-

@@ -1,10 +1,13 @@
 from typing import List
+
+import numpy as np
 from moving_object_detection.moving_object_detector import MovingObject
 from object_classifier.classified_object import ClassifiedObject
 from utils import get_area
 
 
 class ObjectMerger:
+
     def merge_objects(
         self,
         moving_objects: List[MovingObject],
@@ -25,14 +28,42 @@ class ObjectMerger:
                 YB1 = class_obj.get_bbx()[0].y
                 YB2 = class_obj.get_bbx()[1].y
 
-                overlap = max(0, min(XA2, XB2) - max(XA1, XB1)) * max(
-                    0, min(YA2, YB2) - max(YA1, YB1)
-                )
+                overlap = max(0,
+                              min(XA2, XB2) - max(XA1, XB1)) * max(
+                                  0,
+                                  min(YA2, YB2) - max(YA1, YB1))
                 A_total_class_obj = (XB2 - XB1) * (YB2 - YB1)
                 fraction = overlap / A_total_class_obj
 
                 if fraction > 0.5:
                     self.moving_classified_objects.append(class_obj)
+        return self.moving_classified_objects
+
+    def merge_objects_with_threshold(
+        self,
+        threshold_img: np.array,
+        classified_objects: List[ClassifiedObject],
+    ):
+        self.moving_classified_objects: List[ClassifiedObject] = []
+
+        for class_obj in classified_objects:
+
+            X1 = class_obj.get_bbx()[0].x
+            X2 = class_obj.get_bbx()[1].x
+            Y1 = class_obj.get_bbx()[0].y
+            Y2 = class_obj.get_bbx()[1].y
+
+            A_total_class_obj = (X2 - X1) * (Y2 - Y1)
+
+            bbx = threshold_img[Y1:Y2, :]
+            bbx = bbx[:, X1:X2]
+
+            non_zero = np.count_nonzero(bbx)
+
+            fraction = non_zero / A_total_class_obj
+
+            if fraction > 0.25:
+                self.moving_classified_objects.append(class_obj)
         return self.moving_classified_objects
 
 
@@ -41,4 +72,3 @@ if __name__ == "__main__":
     c1 = [ClassifiedObject(8, 13, 4, 4, 20, (4, 3), 0.9, "car")]
     obj_merger = ObjectMerger()
     obj_merger.merge_objects(m1, c1)
-
