@@ -33,6 +33,7 @@ class ObjectMerger:
 
                 if fraction > 0.5:
                     self.moving_classified_objects.append(class_obj)
+        return self.moving_classified_objects
 
 
 if __name__ == "__main__":

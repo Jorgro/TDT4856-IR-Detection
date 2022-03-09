@@ -59,6 +59,7 @@ class MovingObjectDetector:
             self.opt_flow_image[..., 2]
         )  # The third channel of HSV is Value (intensity) which we will use as a grayscale.
         self.connected_components_labeling()
+        return self.moving_objects
 
     def connected_components_labeling(self) -> None:
         connected_components = cv2.connectedComponentsWithStats(
