@@ -132,3 +132,8 @@ dmypy.json
 # MacOS specific
 .DS_Store
 /object_classifier/weights/*
+/data/GUI_images/classified_bbxs/*
+/data/GUI_images/input/*
+/data/GUI_images/moving_bbxs/*
+/data/GUI_images/object_merger/*
+/data/GUI_images/thresholded/*
