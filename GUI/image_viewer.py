@@ -23,6 +23,13 @@ class ImageViewer(object):
             "/thresholded/",
             "/object_merger/",
         ]
+        self.image_texts = [
+            "Input",
+            "Moving objects",
+            "Classified objects",
+            "Thresholded optical flow",
+            "Object filtering",
+        ]
 
         self.N = len(self.image_paths) // 2  # Number of images
         self.x0, self.y0 = 10, 80  # Coordinates of upper left corner
@@ -44,9 +51,11 @@ class ImageViewer(object):
 
         self.canvas_images = []
 
+        print(self.canvas_part)
+
         for i, img in enumerate(images):
             if i > 2:
-                y0 = self.y0 + 300
+                y0 = self.y0 + 400
                 x0 = self.x0 + (i - 3) * self.canvas_part
             else:
                 y0 = self.y0
@@ -54,85 +63,17 @@ class ImageViewer(object):
             self.canvas_images.append(
                 self.canvas.create_image(x0, y0, anchor="nw", image=img)
             )
+        for i, txt in enumerate(self.image_texts):
+            if i > 2:
+                y0 = self.y0 + 380
+                x0 = self.canvas_part // 2 + (i - 3) * self.canvas_part
+            else:
+                y0 = self.y0 - 20
+                x0 = self.canvas_part // 2 + i * self.canvas_part
 
-        self.canvas.create_text(
-            240,
-            self.y0 - 20,
-            text="Input image",
-            fill="black",
-            font=("Helvetica 17 bold"),
-        )
-
-        self.canvas.create_text(
-            240 + self.canvas_part,
-            self.y0 - 20,
-            text="Optical flow",
-            fill="black",
-            font=("Helvetica 17 bold"),
-        )
-
-        self.canvas.create_text(
-            240 + 2 * self.canvas_part,
-            self.y0 - 20,
-            text="Detected elements",
-            fill="black",
-            font=("Helvetica 17 bold"),
-        )
-
-        self.image_text = self.canvas.create_text(
-            self.width // 2 + 5,
-            20,
-            text="Frame " + str(self.iter + 1),
-            fill="black",
-            font=("Helvetica 18 bold"),
-            anchor="center",
-        )
-
-        # self.canvas.create_text(
-        #     self.width // 2,
-        #     self.height // 2 + 80,
-        #     text="Press the buttons above or arrows for the next and previous frame",
-        #     fill="black",
-        #     font=("Helvetica 16 bold"),
-        #     anchor="center",
-        # )
-
-        # self.skip_text = self.canvas.create_text(
-        #     self.width // 2,
-        #     self.height // 2 + 110,
-        #     text="Press space to skip " + str(self.skip_length) + " frames",
-        #     fill="black",
-        #     font=("Helvetica 16 bold"),
-        #     anchor="center",
-        # )
-
-        # self.canvas.create_text(
-        #     self.width // 2,
-        #     self.height // 2 + 140,
-        #     text="Press Q to quit",
-        #     fill="black",
-        #     font=("Helvetica 16 bold"),
-        #     anchor="center",
-        # )
-
-        # self.next = tk.Button(self.root, text="Next frame", command=self.next_image)
-        # self.next.place(relx=0.51, rely=0.6, anchor="center")
-
-        # self.prev = tk.Button(self.root, text="Previous frame", command=self.prev_image)
-        # self.prev.place(relx=0.41, rely=0.6, anchor="center")
-
-        # self.skip = tk.Button(self.root, text="Skip", command=self.skip_image)
-        # self.skip.place(relx=0.59, rely=0.6, anchor="center")
-
-        # self.skip_input = tk.Text(
-        #     self.root, height=1, width=5, borderwidth=1, relief="solid"
-        # )
-        # self.skip_input.place(relx=0.83, rely=0.6, anchor="center")
-
-        # self.skip_input_btn = tk.Button(
-        #     self.root, text="Change skip-length", command=self.change_skip_length
-        # )
-        # self.skip_input_btn.place(relx=0.83, rely=0.65, anchor="center")
+            self.canvas.create_text(
+                x0, y0, text=txt, fill="black", font=("Helvetica 17 bold"),
+            )
 
         self.root.bind("<Right>", self.next_image)
         self.root.bind("<Left>", self.prev_image)
@@ -218,5 +159,6 @@ class ImageViewer(object):
     def quit(self, event: "tk.Event" = None):
         self.root.destroy()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     img = ImageViewer()
